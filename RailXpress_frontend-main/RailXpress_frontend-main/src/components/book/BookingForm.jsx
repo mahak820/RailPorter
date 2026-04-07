@@ -301,32 +301,27 @@ export default function BookingForm() {
             {/* Estimate area */}
             <div style={{ marginBottom: 10 }}>
               <strong>Estimate</strong>
-              {!estimate && <div style={{ color: "var(--muted, #475569)", marginTop:8 }}>Click <b>Get Estimate</b> to preview the fee breakdown.</div>}
+              {!estimate && <div style={{ color: "#475569", marginTop:8 }}>Click <b>Get Estimate</b> to preview the fee breakdown.</div>}
               {estimate && (
                 <div style={{ marginTop:8 }}>
-                  <div style={{
-                    fontSize: 28, fontWeight: 800,
-                    background: "linear-gradient(90deg, #2563eb, #8b5cf6)",
-                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                    marginBottom: 12
-                  }}>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: "#10b981", marginBottom: 10 }}>
                     ₹ {estimate.total ?? estimate}
                   </div>
                   {estimate.breakdown && (
                     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
-                        <span style={{ color: "var(--muted, #6b7280)" }}>Base charge</span>
+                        <span style={{ color: "#94a3b8" }}>Base charge</span>
                         <span style={{ fontWeight: 600 }}>₹ {estimate.breakdown.base}</span>
                       </div>
                       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
-                        <span style={{ color: "var(--muted, #6b7280)" }}>Weight charge</span>
+                        <span style={{ color: "#94a3b8" }}>Weight charge</span>
                         <span style={{ fontWeight: 600 }}>₹ {estimate.breakdown.weightFactor}</span>
                       </div>
                       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
-                        <span style={{ color: "var(--muted, #6b7280)" }}>Distance charge</span>
+                        <span style={{ color: "#94a3b8" }}>Distance charge</span>
                         <span style={{ fontWeight: 600 }}>₹ {estimate.breakdown.distanceFactor}</span>
                       </div>
-                      <div style={{ borderTop: "1px solid var(--border, #e6e9ee)", marginTop: 4, paddingTop: 6, display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 700 }}>
+                      <div style={{ borderTop: "1px solid #253745", marginTop: 4, paddingTop: 6, display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 700 }}>
                         <span>Total</span>
                         <span>₹ {estimate.total}</span>
                       </div>
@@ -337,68 +332,21 @@ export default function BookingForm() {
             </div>
 
             {/* Booking result area */}
-            {!result && <div style={{ color:"var(--muted, #475569)" }}>No booking created yet.</div>}
-            {result && (() => {
-              const b = result.booking || result;
-              return (
+            {!result && <div style={{ color:"#475569" }}>No booking created yet.</div>}
+            {result && (
+              <>
                 <div style={{ marginTop: 8 }}>
-                  <div style={{
-                    display: "inline-block", padding: "4px 10px", borderRadius: 20,
-                    background: "linear-gradient(90deg, #10b981, #06b6d4)",
-                    color: "#fff", fontSize: 12, fontWeight: 700, marginBottom: 10
-                  }}>
-                    Booking Confirmed
-                  </div>
-
-                  <div style={{ fontSize: 13, display: "flex", flexDirection: "column", gap: 8 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: "var(--muted, #6b7280)" }}>Booking Ref</span>
-                      <span style={{ fontWeight: 700, letterSpacing: 0.5 }}>{b.bookingRef}</span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: "var(--muted, #6b7280)" }}>Route</span>
-                      <span style={{ fontWeight: 600 }}>{b.departureStation} → {b.arrivalStation}</span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: "var(--muted, #6b7280)" }}>Date</span>
-                      <span style={{ fontWeight: 600 }}>{b.dateOfTransport}</span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: "var(--muted, #6b7280)" }}>Weight</span>
-                      <span style={{ fontWeight: 600 }}>{b.weightKg} kg</span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: "var(--muted, #6b7280)" }}>Status</span>
-                      <span style={{
-                        padding: "2px 8px", borderRadius: 12,
-                        background: "rgba(16,185,129,0.15)", color: "#10b981",
-                        fontSize: 12, fontWeight: 700
-                      }}>{b.status}</span>
-                    </div>
-                    <div style={{ borderTop: "1px solid var(--border, #e6e9ee)", paddingTop: 8, display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
-                      <span>Fee</span>
-                      <span style={{ fontSize: 18 }}>₹ {b.fee}</span>
-                    </div>
-                  </div>
-
-                  {result.qrBase64 && (
-                    <div style={{ marginTop: 14, textAlign: "center" }}>
-                      <img className="qr" src={`data:image/png;base64,${result.qrBase64}`} alt="QR" style={{ width: 160, borderRadius: 8 }} />
-                      <div style={{ fontSize: 12, color: "var(--muted, #6b7280)", marginTop: 6 }}>Scan at station check-in</div>
-                    </div>
-                  )}
-
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    style={{ width: "100%", marginTop: 12 }}
-                    onClick={() => navigate(`/booking/${b.id}`)}
-                  >
-                    View Full Details
-                  </button>
+                  <strong>Booking created</strong>
+                  <pre style={{ marginTop:8 }}>{JSON.stringify(result.booking || result, null, 2)}</pre>
                 </div>
-              );
-            })()}
+                {result.qrBase64 && (
+                  <div style={{ marginTop:10 }}>
+                    <strong>QR</strong>
+                    <img className="qr" src={`data:image/png;base64,${result.qrBase64}`} alt="QR" />
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -33,7 +33,7 @@ export default function RailLogo({
         className={`rx-train-svg ${animate ? "rx-animate" : ""}`}
         xmlns="http://www.w3.org/2000/svg"
         role="img"
-        aria-label="RailXpress logo"
+        aria-label="RailPorter logo"
       >
         <defs>
           <linearGradient id="g1" x1="0" x2="1">
@@ -97,7 +97,7 @@ export default function RailLogo({
         {/* small brand text */}
         <g className="rx-text" transform="translate(6,60)">
           <text x="0" y="0" fontFamily="Inter, system-ui, -apple-system, 'Segoe UI', Roboto" fontSize="8" fill="#dff4ff" fontWeight="700">
-            Rail<span style={{ fill: "#fff" }}>Xpress</span>
+            Rail<span style={{ fill: "#fff" }}>Porter</span>
           </text>
         </g>
       </svg>

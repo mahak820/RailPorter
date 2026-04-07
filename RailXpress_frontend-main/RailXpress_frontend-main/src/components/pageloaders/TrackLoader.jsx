@@ -8,9 +8,9 @@ import "./TrackLoader.css";
  *  - message (string)    : optional text below animation
  *
  * Usage:
- *  <TrackLoader showFor={1600} message="Starting RailXpress..." />
+ *  <TrackLoader showFor={1600} message="Starting RailPorter..." />
  */
-export default function TrackLoader({ showFor = 1600, message = "Starting RailXpress..." }) {
+export default function TrackLoader({ showFor = 1600, message = "Starting RailPorter..." }) {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {

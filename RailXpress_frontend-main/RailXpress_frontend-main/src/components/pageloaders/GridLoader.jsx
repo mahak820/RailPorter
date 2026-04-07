@@ -11,7 +11,7 @@ import "./GridLoader.css";
  */
 export default function GridLoader({
   show = undefined,
-  message = "Loading RailXpress…",
+  message = "Loading RailPorter…",
   minVisibleMs = 900,
   fadeOutMs = 420,
 }) {

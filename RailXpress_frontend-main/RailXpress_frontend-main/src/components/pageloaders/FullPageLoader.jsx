@@ -14,7 +14,7 @@ import "./FullPageLoader.css";
  */
 export default function FullPageLoader({
   show = undefined,
-  message = "Preparing RailXpress...",
+  message = "Preparing RailPorter...",
   size = 260,
   fadeOutMs = 420,
   minVisibleMs = 900,

@@ -26,10 +26,10 @@ function PrivateRoute({ children }) {
 export default function App() {
   return (
     <>
-      {/* <FullPageLoader message="Preparing RailXpress..." size={260} /> */}
-      {/* <GridLoader message="Loading RailXpress..." minVisibleMs={900} fadeOutMs={420} /> */}
+      {/* <FullPageLoader message="Preparing RailPorter..." size={260} /> */}
+      {/* <GridLoader message="Loading RailPorter..." minVisibleMs={900} fadeOutMs={420} /> */}
       <Loader showFor={3000} /> 
-      {/* <TrackLoader showFor={3000} message="Preparing RailXpress..." /> */}
+      {/* <TrackLoader showFor={3000} message="Preparing RailPorter..." /> */}
       
       <BrowserRouter>
       <Routes>

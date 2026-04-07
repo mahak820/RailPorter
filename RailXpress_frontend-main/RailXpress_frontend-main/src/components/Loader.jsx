@@ -20,7 +20,7 @@ export default function Loader({ showFor = 1200 }) {
         </div>
 
         <div className="logo">
-          🚆 RailXpress
+          🚆 RailPorter
         </div>
       </div>
     </div>

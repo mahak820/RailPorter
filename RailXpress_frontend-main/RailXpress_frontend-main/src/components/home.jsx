@@ -10,9 +10,9 @@ export default function Home() {
       <header className="navbar">
         <div className="container" style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <div className="brand">
-            <div className="logo">RX</div>
+            <div className="logo">RP</div>
             <div>
-              <div style={{fontWeight:700}}>RailXpress</div>
+              <div style={{fontWeight:700}}>RailPorter</div>
               <div className="small-muted">Simplified luggage transport</div>
             </div>
           </div>
@@ -39,11 +39,10 @@ export default function Home() {
       <main className="container">
         <section className="hero">
           <div className="hero-left">
-            <h2 className="hero-title">Ship your luggage easily with RailXpress</h2>
+            <h2 className="hero-title">Ship your luggage easily with RailPorter</h2>
             <p className="hero-sub">Automated form filling, instant fee estimates, QR-based tracking and secure delivery to your destination station.</p>
             <div style={{display:"flex",gap:12}}>
               <Link to="/book" className="btn">Start Booking</Link>
-              <Link to="#how" className="btn secondary">How it works</Link>
             </div>
 
             <div style={{marginTop:18, display:"flex", gap:12}}>
@@ -98,11 +97,11 @@ export default function Home() {
         </section>
 
         <section id="how" style={{marginTop:28}}>
-          <h3>Why choose RailXpress?</h3>
+          <h3>Why choose RailPorter?</h3>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:12, marginTop:12}}>
             <div className="card">
               <div style={{fontWeight:600}}>Auto-fill forms</div>
-              <div className="small-muted">Save time: let RailXpress auto-complete commonly used profiles.</div>
+              <div className="small-muted">Save time: let RailPorter auto-complete commonly used profiles.</div>
             </div>
             <div className="card">
               <div style={{fontWeight:600}}>QR Tracking</div>
@@ -160,7 +159,7 @@ export default function Home() {
         </section>
 
         <footer className="footer">
-          © {new Date().getFullYear()} RailXpress — All rights reserved
+          © {new Date().getFullYear()} RailPorter — All rights reserved
         </footer>
       </main>
     </div>

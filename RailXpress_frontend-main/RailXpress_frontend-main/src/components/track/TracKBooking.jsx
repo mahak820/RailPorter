@@ -1,27 +1,9 @@
 // frontend/src/components/track/TrackBooking.jsx
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { getTimelineByRef, getLatestByRef, getTimelineById } from "../../services/tracking";
-import { Link } from "react-router-dom";
 
-const statusColors = {
-  CREATED:    { bg: "rgba(99,102,241,0.15)",  color: "#6366f1" },
-  PICKED_UP:  { bg: "rgba(245,158,11,0.15)",  color: "#f59e0b" },
-  IN_TRANSIT: { bg: "rgba(6,182,212,0.15)",    color: "#06b6d4" },
-  ARRIVED:    { bg: "rgba(16,185,129,0.15)",   color: "#10b981" },
-  DELIVERED:  { bg: "rgba(16,185,129,0.15)",   color: "#10b981" },
-};
 
-function StatusBadge({ status }) {
-  const s = statusColors[status] || { bg: "rgba(107,114,128,0.15)", color: "#6b7280" };
-  return (
-    <span style={{
-      display: "inline-block", padding: "4px 10px", borderRadius: 20,
-      background: s.bg, color: s.color, fontSize: 12, fontWeight: 700
-    }}>
-      {status}
-    </span>
-  );
-}
+// note: we have getTimelineById in tracking.js
 
 export default function TrackBooking() {
   const [input, setInput] = useState("");
@@ -31,6 +13,7 @@ export default function TrackBooking() {
   const [polling, setPolling] = useState(false);
   const [error, setError] = useState(null);
 
+  // helper: decide whether string looks like a bookingRef (RX-...) or an id
   function looksLikeRef(s) {
     if (!s) return false;
     return /^RX[-_A-Z0-9]+/i.test(s.trim());
@@ -54,32 +37,43 @@ export default function TrackBooking() {
       let lt = null;
 
       if (looksLikeRef(trimmed)) {
+        // try ref endpoints
         try {
+          console.log("Trying timeline by ref:", trimmed);
           tl = await getTimelineByRef(trimmed);
           lt = await getLatestByRef(trimmed);
         } catch (eRef) {
+          // if ref lookup fails, fall through to try as bookingId
           console.warn("ref lookup failed:", eRef);
+          // attempt by id below
         }
       }
 
       if (!tl) {
+        // attempt bookingId timeline
         try {
+          console.log("Trying timeline by bookingId:", trimmed);
           tl = await getTimelineById(trimmed);
+          // latest by id not implemented separately; pick first item as latest
           lt = (tl && tl.length > 0) ? tl[0] : null;
         } catch (eId) {
-          throw eId;
+          console.error("bookingId lookup failed:", eId);
+          throw eId; // bubble up to outer catch
         }
       }
 
       setTimeline(Array.isArray(tl) ? tl : []);
       setLatest(lt || null);
     } catch (e) {
-      setError(e.message || "Lookup failed");
+      // e is the thrown Error from tracking.js (contains message)
+      console.error("Lookup error:", e);
+      setError(e.message || "Lookup failed — see console/network tab");
     } finally {
       setLoading(false);
     }
   }
 
+  // polling
   useEffect(() => {
     if (!polling || !input) return;
     const id = setInterval(() => lookup(input), 8000);
@@ -87,117 +81,47 @@ export default function TrackBooking() {
   }, [polling, input]);
 
   return (
-    <div style={{ minHeight: "100vh", padding: "40px 20px" }}>
-      <div style={{ maxWidth: 800, margin: "0 auto" }}>
-        {/* Header */}
-        <div style={{ marginBottom: 24 }}>
-          <Link to="/" style={{ color: "var(--brand-grad-start, #2563eb)", fontWeight: 600, textDecoration: "none", fontSize: 14 }}>← Back to Home</Link>
-          <h2 style={{ marginTop: 12, fontSize: 24, fontWeight: 700 }}>Track Your Luggage</h2>
-          <p style={{ color: "var(--muted, #6b7280)", fontSize: 14 }}>Enter your booking reference (RX-XXXXXX) or booking ID to track</p>
+    <div style={{ padding: 20, maxWidth: 960, margin: "0 auto" }}>
+      <h2>Track Your Luggage</h2>
+
+      <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Enter bookingRef (e.g. RX-ABC123) or bookingId (UUID)"
+          style={{ flex: 1, padding: 10 }}
+        />
+        <button onClick={() => lookup(input)} style={{ padding: "8px 12px" }}>Lookup</button>
+        <button onClick={() => setPolling((p) => !p)} style={{ padding: "8px 12px" }}>
+          {polling ? "Stop auto-refresh" : "Auto-refresh"}
+        </button>
+      </div>
+
+      {error && <div style={{ color: "#e11d48", marginBottom: 12 }}>{error}</div>}
+      {loading && <div style={{ marginBottom: 12 }}>Loading…</div>}
+
+      {latest && (
+        <div style={{ border: "1px solid #eee", padding: 12, borderRadius: 8, marginBottom: 12 }}>
+          <strong>Current status:</strong> {latest.status}
+          <div style={{ fontSize: 13, color: "#666" }}>{latest.location} — {new Date(latest.createdAt).toLocaleString()}</div>
         </div>
+      )}
 
-        {/* Search bar */}
-        <div className="card" style={{ padding: 20, marginBottom: 20 }}>
-          <div style={{ display: "flex", gap: 10 }}>
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && lookup(input)}
-              placeholder="e.g. RX-A1B2C3D4 or UUID"
-              style={{ flex: 1 }}
-            />
-            <button className="btn btn-primary" onClick={() => lookup(input)} disabled={loading}>
-              {loading ? "Searching..." : "Track"}
-            </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => setPolling((p) => !p)}
-              style={ polling ? { background: "rgba(239,68,68,0.15)", color: "#ef4444", border: "1px solid #ef4444" } : {}}
-            >
-              {polling ? "Stop" : "Auto-refresh"}
-            </button>
-          </div>
-          {error && <div style={{ color: "#ef4444", marginTop: 10, fontSize: 13 }}>{error}</div>}
-          {polling && <div style={{ marginTop: 8, fontSize: 12, color: "var(--muted, #6b7280)" }}>Auto-refreshing every 8 seconds...</div>}
-        </div>
+      <h3>Timeline</h3>
+      {timeline.length === 0 && <div style={{ color: "#6b7280" }}>No updates yet.</div>}
+      <ul style={{ listStyle: "none", padding: 0 }}>
+        {timeline.map(item => (
+          <li key={item.id} style={{ padding: 10, borderBottom: "1px solid #f6f6f6" }}>
+            <div style={{ fontWeight: 700 }}>{item.status}</div>
+            <div style={{ color: "#333" }}>{item.location}</div>
+            <div style={{ color: "#666", fontSize: 13 }}>{item.notes}</div>
+            <div style={{ color: "#999", fontSize: 12 }}>{new Date(item.createdAt).toLocaleString()}</div>
+          </li>
+        ))}
+      </ul>
 
-        {/* Current Status Card */}
-        {latest && (
-          <div className="card" style={{ padding: 20, marginBottom: 20 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-              <h3 style={{ fontSize: 16 }}>Current Status</h3>
-              <StatusBadge status={latest.status} />
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              <div>
-                <div style={{ fontSize: 12, color: "var(--muted, #6b7280)" }}>Location</div>
-                <div style={{ fontWeight: 600, fontSize: 15 }}>{latest.location || "—"}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 12, color: "var(--muted, #6b7280)" }}>Last Updated</div>
-                <div style={{ fontWeight: 600, fontSize: 15 }}>{new Date(latest.createdAt).toLocaleString()}</div>
-              </div>
-              {latest.notes && (
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <div style={{ fontSize: 12, color: "var(--muted, #6b7280)" }}>Notes</div>
-                  <div style={{ fontWeight: 500, fontSize: 14 }}>{latest.notes}</div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Timeline */}
-        {(timeline.length > 0 || loading) && (
-          <div className="card" style={{ padding: 20 }}>
-            <h3 style={{ fontSize: 16, marginBottom: 16 }}>Tracking Timeline</h3>
-            {timeline.length === 0 && !loading && (
-              <div style={{ color: "var(--muted, #6b7280)", textAlign: "center", padding: 20 }}>No status updates yet.</div>
-            )}
-            <div style={{ position: "relative", paddingLeft: 24 }}>
-              {/* Vertical line */}
-              {timeline.length > 1 && (
-                <div style={{
-                  position: "absolute", left: 7, top: 8, bottom: 8, width: 2,
-                  background: "linear-gradient(180deg, #2563eb, #8b5cf6)"
-                }} />
-              )}
-              {timeline.map((item, idx) => (
-                <div key={item.id} style={{ position: "relative", paddingBottom: idx < timeline.length - 1 ? 20 : 0 }}>
-                  {/* Dot */}
-                  <div style={{
-                    position: "absolute", left: -20, top: 4, width: 16, height: 16, borderRadius: "50%",
-                    background: idx === 0
-                      ? "linear-gradient(135deg, #2563eb, #8b5cf6)"
-                      : "var(--border, #e6e9ee)",
-                    border: "2px solid var(--card-bg, #fff)"
-                  }} />
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                    <div>
-                      <StatusBadge status={item.status} />
-                      <div style={{ fontWeight: 600, fontSize: 14, marginTop: 6 }}>{item.location || "—"}</div>
-                      {item.notes && <div style={{ color: "var(--muted, #6b7280)", fontSize: 13, marginTop: 2 }}>{item.notes}</div>}
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--muted, #6b7280)", whiteSpace: "nowrap", marginLeft: 12 }}>
-                      {new Date(item.createdAt).toLocaleString()}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Empty state */}
-        {!latest && !loading && timeline.length === 0 && !error && (
-          <div className="card" style={{ padding: 40, textAlign: "center" }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-            <h3 style={{ marginBottom: 8 }}>Enter your tracking ID</h3>
-            <p style={{ color: "var(--muted, #6b7280)", fontSize: 14 }}>
-              Your booking reference starts with <strong>RX-</strong> and was provided when you created the booking.
-            </p>
-          </div>
-        )}
+      <div style={{ marginTop: 20, fontSize: 13, color: "#666" }}>
+        Tip: Open browser DevTools → Network to see the exact request URL that the UI used (helps debug 404s).
       </div>
     </div>
   );
