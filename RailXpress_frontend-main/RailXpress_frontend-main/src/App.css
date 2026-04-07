@@ -1,0 +1,12 @@
+/* src/index.css or App.css */
+.max-w-md { max-width: 640px; }
+.mx-auto { margin-left:auto; margin-right:auto; }
+.mt-12 { margin-top: 3rem; }
+.p-6 { padding: 1.5rem; }
+.border { border: 1px solid #e5e7eb; }
+.rounded { border-radius: 8px; }
+.shadow-sm { box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.text-red-600 { color: #e11d48; }
+.bg-blue-600 { background: #2563eb; }
+.bg-green-600 { background: #16a34a; }
+.text-white { color: #fff; }

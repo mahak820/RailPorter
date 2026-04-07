@@ -1,0 +1,102 @@
+/* src/styles.css - global styles for Login, Signup, Home */
+:root{
+  --primary:#2563eb;
+  --primary-dark:#1f4fbf;
+  --muted:#6b7280;
+  --card:#ffffff;
+  --bg:#f8fafc;
+  --success:#16a34a;
+  --danger:#e11d48;
+  --radius:8px;
+}
+
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background:var(--bg);
+  color:#111827;
+  -webkit-font-smoothing:antialiased;
+}
+
+.container{
+  max-width:1100px;
+  margin:0 auto;
+  padding:20px;
+}
+
+/* NAV */
+.navbar{
+  background:rgba(255,255,255,0.85);
+  backdrop-filter: blur(6px);
+  padding:12px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid #e6edf3;
+}
+.brand{
+  display:flex;align-items:center;gap:12px;
+}
+.brand .logo{
+  width:44px;height:44px;border-radius:8px;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;
+  font-size:18px;
+}
+.navlinks{display:flex;align-items:center;gap:12px}
+.navlinks a{color:var(--muted);text-decoration:none;font-size:14px;padding:6px 10px;border-radius:6px}
+.navlinks a.cta{background:var(--primary);color:white}
+.navlinks a:hover{background:#f1f5f9}
+
+/* HERO */
+.hero{
+  display:flex;gap:30px;align-items:center;padding:40px 20px;
+}
+.hero-left{flex:1}
+.hero-title{font-size:34px;margin:0 0 12px;line-height:1.05}
+.hero-sub{color:var(--muted);margin-bottom:18px}
+
+/* Quick card */
+.card{
+  background:var(--card);
+  padding:18px;
+  border-radius:12px;
+  box-shadow: 0 6px 18px rgba(20,20,30,0.04);
+  border:1px solid #eef2f6;
+}
+
+/* small form inside hero */
+.quick-form input, .quick-form select{
+  width:100%;
+  padding:10px 12px;
+  border:1px solid #e6edf3;
+  border-radius:8px;
+  font-size:14px;
+}
+.quick-form label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+.quick-form .row{display:flex;gap:8px}
+.quick-form .row > div{flex:1}
+
+/* Booking button */
+.btn{
+  display:inline-block;padding:10px 16px;border-radius:8px;background:var(--primary);color:#fff;text-decoration:none;border:none;cursor:pointer;font-weight:600;
+}
+.btn.secondary{background:#f3f6fb;color:var(--muted);border:1px solid #e6edf3}
+
+/* Form layout for login/signup */
+.form-wrapper{max-width:520px;margin:30px auto;padding:22px;background:var(--card);border-radius:12px;border:1px solid #eef2f6}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+.field input{width:100%;padding:10px 12px;border:1px solid #e6edf3;border-radius:8px;font-size:14px}
+.field .error{color:var(--danger);font-size:13px;margin-top:6px}
+
+/* two-column grid */
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+
+/* small utilities */
+.small-muted{font-size:13px;color:var(--muted)}
+.inline-link{color:var(--primary);text-decoration:none;margin-left:6px}
+.center{display:flex;justify-content:center;align-items:center}
+
+/* footer */
+.footer{margin-top:36px;padding:24px 0;color:var(--muted);font-size:13px;border-top:1px solid #eef2f6;text-align:center}

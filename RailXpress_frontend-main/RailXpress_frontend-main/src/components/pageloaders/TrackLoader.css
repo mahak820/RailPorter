@@ -1,0 +1,163 @@
+/* TrackLoader.css - track moving loader */
+
+/* BACKDROP */
+.tl-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 20% 20%, rgba(12,18,24,0.15), rgba(2,6,10,0.85) 40%), linear-gradient(180deg, #051018 -10%, #071b26 60%);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  padding: 24px;
+  transition: opacity .48s ease, visibility .48s ease;
+}
+
+/* container */
+.tl-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+  pointer-events: none; /* let clicks pass through if needed */
+}
+
+/* track wrapper sizes the animation */
+.tl-track-wrap {
+  width: min(78vmin, 880px);
+  max-width: 92vw;
+  height: min(30vmin, 220px);
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: visible;
+}
+
+/* the long track strip where train moves */
+.tl-track {
+  width: 100%;
+  height: 48px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)) top,
+    repeating-linear-gradient(90deg, rgba(20,30,40,0.02) 0 8px, rgba(255,255,255,0.01) 8px 16px) center,
+    linear-gradient(180deg,#07121a,#0b2430);
+  box-shadow: 0 12px 42px rgba(0,0,0,0.7), inset 0 -6px 24px rgba(0,0,0,0.35);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+/* sleepers (rail ties) animation (parallax illusion) implemented as :before with background */
+.tl-track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(90deg, rgba(140,160,180,0.06) 1px, transparent 1px);
+  /* create repeated sleepers using background-size and move them */
+  background-size: 80px 100%;
+  background-position: 0 50%;
+  opacity: 0.35;
+  transform-origin: center;
+  animation: sleepers-move 1.6s linear infinite;
+  z-index: 1;
+}
+
+/* train element absolutely positioned and animated left->right */
+.tl-train {
+  position: absolute;
+  left: -16%;
+  top: 50%;
+  transform: translateY(-50%) scale(0.95);
+  z-index: 6;
+  animation: train-move 1.6s cubic-bezier(.2,.9,.2,1) infinite;
+  will-change: transform;
+}
+
+/* small scale pulse for train shadow effect */
+.tl-train::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  bottom: -14px;
+  width: 42%;
+  height: 6px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.45), rgba(0,0,0,0.12));
+  filter: blur(6px);
+  transform-origin: center;
+  z-index: -1;
+}
+
+/* svg fits nicely */
+.tl-train-svg {
+  width: 140px;
+  height: 70px;
+  display: block;
+  filter: drop-shadow(0 8px 14px rgba(3,8,12,0.65));
+}
+
+/* subtle moving rails in foreground for depth */
+.tl-foreground-rails {
+  position: absolute;
+  bottom: 6px;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background-image: linear-gradient(90deg, rgba(255,255,255,0.03) 0 2px, transparent 2px 8px);
+  background-size: 120px 100%;
+  opacity: 0.9;
+  animation: rails-move 1.6s linear infinite;
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* message style */
+.tl-message {
+  color: rgba(230,240,250,0.9);
+  font-size: 15px;
+  letter-spacing: 0.2px;
+  opacity: 0.95;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+/* Animations */
+@keyframes sleepers-move {
+  0% { background-position: 0 50%; }
+  100% { background-position: 160px 50%; }
+}
+@keyframes rails-move {
+  0% { background-position: 0 50%; }
+  100% { background-position: 240px 50%; }
+}
+@keyframes train-move {
+  0%   { transform: translate(-20vw, -50%) scale(.9) translateZ(0); opacity: 0.15; }
+  12%  { opacity: 1; transform: translate(-6vw, -50%) scale(1.0); }
+  50%  { transform: translate(50%, -50%) scale(1.02) translateZ(0); }
+  88%  { transform: translate(106%, -50%) scale(.98); opacity: 1; }
+  100% { transform: translate(120%, -50%) scale(.92); opacity: 0.15; }
+}
+
+/* RESPONSIVE */
+@media (max-width: 880px) {
+  .tl-track-wrap { height: min(24vmin, 160px); }
+  .tl-track { height: 42px; }
+  .tl-train-svg { width: 120px; height: 58px; }
+}
+@media (max-width: 520px) {
+  .tl-track-wrap { height: min(30vmin, 140px); }
+  .tl-track { height: 36px; }
+  .tl-train-svg { width: 104px; height: 48px; }
+}
+
+/* reduced motion respect */
+@media (prefers-reduced-motion: reduce) {
+  .tl-track::before,
+  .tl-foreground-rails,
+  .tl-train { animation: none !important; }
+}

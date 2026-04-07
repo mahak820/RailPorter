@@ -1,0 +1,82 @@
+/* frontend/src/components/RailLogo.css */
+
+.rx-logo-root {
+  display: inline-block;
+  line-height: 0;
+  --rx-primary: #0b67ff;
+  --rx-accent: #7b39ff;
+  --rx-animate: 1;
+}
+
+/* svg sizing */
+.rx-train-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* wheels rotate when animate enabled */
+.rx-animate .rx-wheels .wheel {
+  transform-origin: center;
+  animation: rx-wheel-rotate 720ms linear infinite;
+  will-change: transform;
+}
+
+/* gentle train bob to simulate motion */
+.rx-animate .rx-train {
+  transform-origin: center;
+  animation: rx-train-bob 1400ms cubic-bezier(.2,.9,.2,1) infinite;
+  will-change: transform;
+}
+
+/* motion streaks slide (behind train) */
+.rx-animate .rx-streaks .streak.s1 {
+  animation: rx-streak 1000ms linear infinite;
+}
+.rx-animate .rx-streaks .streak.s2 {
+  animation: rx-streak 1200ms linear infinite;
+  animation-delay: 220ms;
+}
+
+/* subtle depth parallax on sleepers (tiny movement) */
+.rx-animate .rx-sleepers {
+  animation: rx-sleeper-move 1400ms linear infinite;
+}
+
+/* keyframes */
+@keyframes rx-wheel-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes rx-train-bob {
+  0% { transform: translateY(0px) translateZ(0); }
+  25% { transform: translateY(-2.2px) translateZ(0); }
+  50% { transform: translateY(0px) translateZ(0); }
+  75% { transform: translateY(-1.2px) translateZ(0); }
+  100% { transform: translateY(0px) translateZ(0); }
+}
+@keyframes rx-streak {
+  0% { transform: translateX(0); opacity: 0.18; }
+  30% { opacity: 0.26; }
+  100% { transform: translateX(220%); opacity: 0; }
+}
+@keyframes rx-sleeper-move {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
+
+/* disable animations if reduced-motion requested */
+@media (prefers-reduced-motion: reduce) {
+  .rx-animate .rx-wheels .wheel,
+  .rx-animate .rx-train,
+  .rx-animate .rx-streaks .streak,
+  .rx-animate .rx-sleepers {
+    animation: none !important;
+  }
+}
+
+/* quick responsive tweak if container is very small */
+@media (max-width: 380px) {
+  .rx-logo-root { transform: scale(0.92); }
+}

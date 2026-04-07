@@ -1,0 +1,240 @@
+/* GridLoader.css - improved fallback and layout so animation works reliably */
+
+/* variables */
+:root{
+  --backdrop: rgba(6,10,14,0.72);
+  --text: #e6eef6;
+  --muted: rgba(230,238,246,0.65);
+  --grid-font: 4.6vmin;
+  --fade-ms: 420ms;
+  --cell-gap: 2vmin;
+  --cell-size: min(18vmin, 160px);
+}
+
+/* backdrop & centering */
+.grid-loader-backdrop{
+  position: fixed;
+  inset: 0;
+  background: var(--backdrop);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:99999;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: opacity var(--fade-ms) ease, visibility 0s linear var(--fade-ms);
+  opacity: 1;
+  visibility: visible;
+  padding: 24px;
+}
+.grid-loader-backdrop.hide{
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* loader layout */
+.grid-loader{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  align-items:center;
+  color:var(--text);
+  text-align:center;
+  pointer-events:none;
+}
+
+/* message */
+.grid-loader-message{
+  color:var(--muted);
+  font-size:14px;
+}
+
+/* grid container: fixed 4x4 layout */
+.stuck-grid{
+  width: min(78vmin, 960px);
+  height: min(78vmin, 960px);
+  max-width: 92vw;
+  max-height: 92vw;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  place-items: center;
+  gap: var(--cell-gap);
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  position: relative;
+  overflow: hidden;
+  padding: 2vmin;
+}
+
+/* each item default visuals */
+.grid-item{
+  font-size: var(--grid-font);
+  font-weight: 300;
+  color: var(--text);
+  transform-style: preserve-3d;
+  will-change: transform, opacity, filter;
+  text-wrap: nowrap;
+  display:inline-block;
+  padding: 0.45em 0.6em;
+  user-select: none;
+  opacity: 0;
+  transform: translateZ(-600px) scale(0.86);
+  filter: blur(6px);
+}
+
+/* special center big item */
+.grid-item.special b{
+  font-size: 14vmin;
+  line-height:0.9;
+  font-weight:700;
+}
+
+/* zoom keyframes (used both for timeline-supported browsers and fallback) */
+@keyframes zoom-in {
+  0%   { transform: translateZ(-900px) scale(.9); opacity: 0; filter: blur(6px); }
+  50%  { transform: translateZ(0px) scale(1.02); opacity: 1; filter: blur(0px); }
+  100% { transform: translateZ(900px) scale(.96); opacity: 0; filter: blur(6px); }
+}
+
+/* -------------------------
+   TIMELINE-SUPPORTED VERSION
+   (applies when browser supports animation-timeline)
+   ------------------------- */
+@supports (animation-timeline: scroll(root block)) {
+  .grid-item{
+    animation: zoom-in linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  /* explicit ranges (keeps your original mapping) */
+  .grid-item:nth-of-type(1)  { animation-range: 40% 50% }
+  .grid-item:nth-of-type(2)  { animation-range: 20% 30% }
+  .grid-item:nth-of-type(3)  { animation-range: 52% 62% }
+  .grid-item:nth-of-type(4)  { animation-range: 50% 60% }
+  .grid-item:nth-of-type(5)  { animation-range: 45% 55% }
+  .grid-item:nth-of-type(6)  { animation-range: 10% 20% }
+  .grid-item:nth-of-type(7)  { animation-range: 90% 100% }
+  .grid-item:nth-of-type(8)  { animation-range: 30% 40% }
+  .grid-item:nth-of-type(9)  { animation-range: 80% 90% }
+  .grid-item:nth-of-type(10) { animation-range: 70% 80% }
+  .grid-item:nth-of-type(11) { animation-range: -10% 50% }
+  .grid-item:nth-of-type(12) { animation-range: 52% 62% }
+  .grid-item:nth-of-type(13) { animation-range: 15% 25% }
+  .grid-item:nth-of-type(14) { animation-range: 7% 17% }
+  .grid-item:nth-of-type(15) { animation-range: 75% 85% }
+  .grid-item:nth-of-type(16) { animation-range: 3% 13% }
+  .grid-item:nth-of-type(17) { animation-range: 87% 97% }
+  .grid-item:nth-of-type(18) { animation-range: 42% 52% }
+  .grid-item:nth-of-type(19) { animation-range: 57% 67% }
+  .grid-item:nth-of-type(20) { animation-range: 37% 47% }
+  .grid-item:nth-of-type(21) { animation-range: 12% 22% }
+  .grid-item:nth-of-type(22) { animation-range: 8% 18% }
+  .grid-item:nth-of-type(23) { animation-range: 84% 94% }
+  .grid-item:nth-of-type(24) { animation-range: 33% 43% }
+  .grid-item:nth-of-type(25) { animation-range: 48% 58% }
+  .grid-item:nth-of-type(26) { animation-range: 13% 23% }
+  .grid-item:nth-of-type(27) { animation-range: 78% 88% }
+  .grid-item:nth-of-type(28) { animation-range: 62% 72% }
+  .grid-item:nth-of-type(29) { animation-range: 31% 41% }
+  .grid-item:nth-of-type(30) { animation-range: 8% 18% }
+  .grid-item:nth-of-type(31) { animation-range: 4% 14% }
+  .grid-item:nth-of-type(32) { animation-range: 74% 84% }
+  .grid-item:nth-of-type(33) { animation-range: 61% 71% }
+  .grid-item:nth-of-type(34) { animation-range: 26% 36% }
+  .grid-item:nth-of-type(35) { animation-range: 63% 73% }
+  .grid-item:nth-of-type(36) { animation-range: 11% 21% }
+  .grid-item:nth-of-type(37) { animation-range: 89% 99% }
+  .grid-item:nth-of-type(38) { animation-range: 33% 43% }
+  .grid-item:nth-of-type(39) { animation-range: 88% 98% }
+  .grid-item:nth-of-type(40) { animation-range: 22% 32% }
+  .grid-item:nth-of-type(41) { animation-range: 16% 26% }
+  .grid-item:nth-of-type(42) { animation-range: 26% 36% }
+  .grid-item:nth-of-type(43) { animation-range: 66% 76% }
+  .grid-item:nth-of-type(44) { animation-range: 3% 13% }
+  .grid-item:nth-of-type(45) { animation-range: 44% 54% }
+  .grid-item:nth-of-type(46) { animation-range: 11% 21% }
+  .grid-item:nth-of-type(47) { animation-range: 23% 33% }
+  .grid-item:nth-of-type(48) { animation-range: 39% 49% }
+  .grid-item:nth-of-type(49) { animation-range: 59% 69% }
+  .grid-item:nth-of-type(50) { animation-range: 6% 16% }
+}
+
+/* -------------------------------------
+   FALLBACK (no animation-timeline support)
+   We'll explicitly position items into grid cells and apply a looping
+   staggered zoom animation so it's visible and lively.
+   ------------------------------------- */
+@supports not (animation-timeline: scroll(root block)) {
+  .grid-item{
+    animation: zoom-in 2200ms ease-in-out both infinite;
+    /* use --index to stagger slightly; set in JSX inline style */
+    animation-delay: calc(var(--index) * 80ms);
+  }
+
+  /* Explicit placement so grid looks like the intended mapping even without @supports.
+     This maps first 16 items into 4x4 cells; extra items will also occupy cells (wrap/clamp).
+     You can tweak mapping as desired. */
+  .grid-item:nth-of-type(1)  { grid-column: 1; grid-row: 1; }
+  .grid-item:nth-of-type(2)  { grid-column: 2; grid-row: 1; }
+  .grid-item:nth-of-type(3)  { grid-column: 3; grid-row: 1; }
+  .grid-item:nth-of-type(4)  { grid-column: 4; grid-row: 1; }
+  .grid-item:nth-of-type(5)  { grid-column: 1; grid-row: 2; }
+  .grid-item:nth-of-type(6)  { grid-column: 2; grid-row: 2; }
+  .grid-item:nth-of-type(7)  { grid-column: 3; grid-row: 2; }
+  .grid-item:nth-of-type(8)  { grid-column: 4; grid-row: 2; }
+  .grid-item:nth-of-type(9)  { grid-column: 1; grid-row: 3; }
+  .grid-item:nth-of-type(10) { grid-column: 2; grid-row: 3; }
+  .grid-item:nth-of-type(11) { grid-column: 3; grid-row: 3; }
+  .grid-item:nth-of-type(12) { grid-column: 4; grid-row: 3; }
+  .grid-item:nth-of-type(13) { grid-column: 1; grid-row: 4; }
+  .grid-item:nth-of-type(14) { grid-column: 2; grid-row: 4; }
+  .grid-item:nth-of-type(15) { grid-column: 3; grid-row: 4; }
+  .grid-item:nth-of-type(16) { grid-column: 4; grid-row: 4; }
+
+  /* for items beyond 16, map them into the grid repeating positions so it fills nicely */
+  .grid-item:nth-of-type(17) { grid-column: 1; grid-row: 1; }
+  .grid-item:nth-of-type(18) { grid-column: 2; grid-row: 1; }
+  .grid-item:nth-of-type(19) { grid-column: 3; grid-row: 1; }
+  .grid-item:nth-of-type(20) { grid-column: 4; grid-row: 1; }
+  .grid-item:nth-of-type(21) { grid-column: 1; grid-row: 2; }
+  .grid-item:nth-of-type(22) { grid-column: 2; grid-row: 2; }
+  .grid-item:nth-of-type(23) { grid-column: 3; grid-row: 2; }
+  .grid-item:nth-of-type(24) { grid-column: 4; grid-row: 2; }
+  .grid-item:nth-of-type(25) { grid-column: 1; grid-row: 3; }
+  .grid-item:nth-of-type(26) { grid-column: 2; grid-row: 3; }
+  .grid-item:nth-of-type(27) { grid-column: 3; grid-row: 3; }
+  .grid-item:nth-of-type(28) { grid-column: 4; grid-row: 3; }
+  .grid-item:nth-of-type(29) { grid-column: 1; grid-row: 4; }
+  .grid-item:nth-of-type(30) { grid-column: 2; grid-row: 4; }
+  .grid-item:nth-of-type(31) { grid-column: 3; grid-row: 4; }
+  .grid-item:nth-of-type(32) { grid-column: 4; grid-row: 4; }
+
+  /* the rest will wrap similarly if present */
+}
+
+/* style the special cell to occupy center cells */
+.grid-item.special{
+  grid-column: 2 / span 2;
+  grid-row: 2 / span 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* small responsiveness */
+@media (max-width:880px){
+  .stuck-grid{ gap: 3vmin; width: min(86vmin,720px); height: min(86vmin,720px); }
+  .grid-item{ font-size:6.5vmin; padding:.5em .6em; }
+  .grid-item.special b{ font-size:12vmin; }
+}
+@media (max-width:520px){
+  .stuck-grid{ width:88vw; height:88vw; gap:3vmin; }
+  .grid-item{ font-size:7.5vmin; }
+  .grid-item.special b{ font-size:10vmin; }
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .grid-item{ animation:none !important; transform:none !important; opacity:1 !important; filter:none !important; }
+}

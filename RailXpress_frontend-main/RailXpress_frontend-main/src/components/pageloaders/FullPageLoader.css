@@ -1,0 +1,224 @@
+/* FullPageLoader.css
+   Centered ring + QR frame + checker overlay with fade/burst animation
+*/
+
+:root {
+  --loader-backdrop: rgba(5, 8, 12, 0.64);
+  --qr-bg: #07121a;
+  --frame-accent-start: #0b67ff;
+  --frame-accent-end: #7b39ff;
+  --beam-color: rgba(130, 200, 255, 0.12);
+  --beam-highlight: rgba(0, 168, 255, 0.56);
+  --text: #e7eef8;
+  --muted: rgba(231, 237, 243, 0.75);
+  --radius: 18px;
+  --qr-size: 260px;
+  --ring-size: 416px;
+  --fade-millis: 420ms;
+  --checker-opacity: 0.18;
+  --checker-color: rgba(255,255,255,0.08);
+}
+
+/* Full backdrop */
+.fp-loader-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--loader-backdrop);
+  z-index: 99999;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  padding: 24px;
+  transition: opacity var(--fade-millis) ease, visibility 0s linear var(--fade-millis);
+  opacity: 1;
+  visibility: visible;
+}
+
+/* hide (fade) state for backdrop */
+.fp-loader-backdrop.fp-hide {
+  opacity: 0;
+  visibility: hidden;
+  transition-delay: 0s;
+}
+
+/* main container (centers content vertically) */
+.fp-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  color: var(--text);
+  text-align: center;
+  position: relative;
+  pointer-events: none; /* loader won't capture clicks */
+}
+
+/* center wrapper to align ring and frame exactly */
+.fp-center-wrap {
+  position: relative;
+  width: var(--ring-size);
+  height: var(--ring-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* rotating outer ring (centered exactly) */
+.fp-outer-ring {
+  position: absolute;
+  width: var(--ring-size);
+  height: var(--ring-size);
+  border-radius: 9999px;
+  transform: rotate(0deg);
+  background: conic-gradient(from 150deg, rgba(255,255,255,0.03), rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+  box-shadow: 0 16px 60px rgba(0,0,0,0.65);
+  z-index: 0;
+  animation: fp-ring-rotate 3.2s linear infinite;
+  pointer-events: none;
+}
+
+/* QR frame centered inside the ring */
+.fp-qr-frame {
+  position: relative;
+  width: var(--qr-size);
+  height: var(--qr-size);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)), var(--qr-bg);
+  box-shadow: 0 18px 50px rgba(2,6,12,0.7);
+  overflow: hidden;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* subtle finder-corners */
+.fp-qr-frame::before,
+.fp-qr-frame::after {
+  content: "";
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 4px solid rgba(255,255,255,0.06);
+}
+.fp-qr-frame::before { left: 14px; top: 14px; border-right: none; border-bottom: none; }
+.fp-qr-frame::after  { right: 14px; bottom: 14px; border-left: none; border-top: none; }
+
+/* CHECKER OVERLAY
+   Use repeating background to produce a checker pattern.
+   The overlay animates on hide (scale up + fade) for the Paytm-like effect.
+*/
+.fp-checker {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: var(--checker-opacity);
+  transition: transform var(--fade-millis) ease, opacity var(--fade-millis) ease;
+  background-image:
+    linear-gradient(45deg, var(--checker-color) 25%, transparent 25%, transparent 75%, var(--checker-color) 75%, var(--checker-color)),
+    linear-gradient(45deg, var(--checker-color) 25%, transparent 25%, transparent 75%, var(--checker-color) 75%, var(--checker-color));
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+  mix-blend-mode: screen;
+  transform-origin: center center;
+}
+
+/* SCAN BEAM (on top of checker) */
+.fp-scan-beam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 30%;
+  top: -30%;
+  background: linear-gradient(180deg, rgba(0,0,0,0), var(--beam-color), rgba(0,0,0,0));
+  mix-blend-mode: screen;
+  filter: blur(6px);
+  transform: translateY(0);
+  animation: fp-beam-scan 2s ease-in-out infinite;
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* three pulsing dots inside qr frame */
+.fp-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 5;
+}
+.fp-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  animation: fp-dot-pulse 1.2s infinite ease-in-out;
+}
+.fp-dots span:nth-child(1) { animation-delay: 0s; background: rgba(255,255,255,0.12); }
+.fp-dots span:nth-child(2) { animation-delay: 0.12s; background: rgba(255,255,255,0.09); }
+.fp-dots span:nth-child(3) { animation-delay: 0.24s; background: rgba(255,255,255,0.07); }
+
+/* message */
+.fp-loader-message {
+  font-size: 15px;
+  color: var(--muted);
+  margin-top: 6px;
+  max-width: 420px;
+  z-index: 6;
+}
+
+/* ===== Animations ===== */
+@keyframes fp-beam-scan {
+  0%   { top: -30%; opacity: 0; }
+  10%  { opacity: 0.85; }
+  50%  { top: 40%; opacity: 1; }
+  90%  { opacity: 0.85; }
+  100% { top: 120%; opacity: 0; }
+}
+
+@keyframes fp-ring-rotate {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fp-dot-pulse {
+  0%   { transform: translateY(0); opacity: .45; }
+  50%  { transform: translateY(-6px); opacity: 1; }
+  100% { transform: translateY(0); opacity: .45; }
+}
+
+/* ===== Hide / burst effect when loader fades =====
+   When .fp-hide is applied to the backdrop, animate the checker overlay:
+   - scale up slightly and fade out quickly (burst)
+   - fade and slightly scale down the whole qr-frame for a nicer effect
+*/
+.fp-loader-backdrop.fp-hide .fp-checker {
+  transform: scale(1.6) rotate(6deg);
+  opacity: 0;
+  transition-timing-function: cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.fp-loader-backdrop.fp-hide .fp-qr-frame {
+  transform: scale(0.96);
+  transition: transform var(--fade-millis) ease, opacity var(--fade-millis) ease;
+  opacity: 0.0;
+}
+
+/* ensure ring fades a bit as well */
+.fp-loader-backdrop.fp-hide .fp-outer-ring {
+  opacity: 0.18;
+  transform: scale(1.04) rotate(12deg);
+  transition: transform var(--fade-millis) ease, opacity var(--fade-millis) ease;
+}
+
+/* responsive */
+@media (max-width: 520px) {
+  :root { --qr-size: 180px; --ring-size: 300px; }
+  .fp-loader-message { font-size: 13px; }
+}
