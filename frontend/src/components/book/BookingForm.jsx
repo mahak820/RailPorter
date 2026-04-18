@@ -333,20 +333,51 @@ export default function BookingForm() {
 
             {/* Booking result area */}
             {!result && <div style={{ color:"#475569" }}>No booking created yet.</div>}
-            {result && (
-              <>
+            {result && (() => {
+              const b = result.booking || result;
+              return (
                 <div style={{ marginTop: 8 }}>
-                  <strong>Booking created</strong>
-                  <pre style={{ marginTop:8 }}>{JSON.stringify(result.booking || result, null, 2)}</pre>
-                </div>
-                {result.qrBase64 && (
-                  <div style={{ marginTop:10 }}>
-                    <strong>QR</strong>
-                    <img className="qr" src={`data:image/png;base64,${result.qrBase64}`} alt="QR" />
+                  <div style={{
+                    display: "inline-block", padding: "4px 10px", borderRadius: 20,
+                    background: "#10b981", color: "#fff", fontSize: 12, fontWeight: 700, marginBottom: 10
+                  }}>Booking Confirmed</div>
+
+                  <div style={{ fontSize: 13, display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ color: "#94a3b8" }}>Booking Ref</span>
+                      <span style={{ fontWeight: 700 }}>{b.bookingRef}</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ color: "#94a3b8" }}>Route</span>
+                      <span style={{ fontWeight: 600 }}>{b.departureStation} → {b.arrivalStation}</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ color: "#94a3b8" }}>Date</span>
+                      <span style={{ fontWeight: 600 }}>{b.dateOfTransport}</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ color: "#94a3b8" }}>Weight</span>
+                      <span style={{ fontWeight: 600 }}>{b.weightKg} kg</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ color: "#94a3b8" }}>Status</span>
+                      <span style={{ padding: "2px 8px", borderRadius: 12, background: "rgba(16,185,129,0.15)", color: "#10b981", fontSize: 12, fontWeight: 700 }}>{b.status}</span>
+                    </div>
+                    <div style={{ borderTop: "1px solid #253745", paddingTop: 8, display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
+                      <span>Fee</span>
+                      <span style={{ fontSize: 18 }}>₹ {b.fee}</span>
+                    </div>
                   </div>
-                )}
-              </>
-            )}
+
+                  {result.qrBase64 && (
+                    <div style={{ marginTop: 14, textAlign: "center" }}>
+                      <img className="qr" src={`data:image/png;base64,${result.qrBase64}`} alt="QR" style={{ width: 160, borderRadius: 8 }} />
+                      <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 6 }}>Scan at station check-in</div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>
