@@ -37,6 +37,12 @@ public class Booking {
     private String status;
     private Double fee;
 
+    private String trainNo;
+    private String trainName;
+    private String trainDepartureTime;
+
+    private String email;
+
     private LocalDateTime createdAt;
 
     public Booking() {
@@ -189,4 +195,16 @@ public class Booking {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public String getTrainNo() { return trainNo; }
+    public void setTrainNo(String trainNo) { this.trainNo = trainNo; }
+
+    public String getTrainName() { return trainName; }
+    public void setTrainName(String trainName) { this.trainName = trainName; }
+
+    public String getTrainDepartureTime() { return trainDepartureTime; }
+    public void setTrainDepartureTime(String trainDepartureTime) { this.trainDepartureTime = trainDepartureTime; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 }

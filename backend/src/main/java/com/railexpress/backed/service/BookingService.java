@@ -46,6 +46,11 @@ public class BookingService {
         b.setDeclaration(req.declaration);
         b.setStatus("CREATED");
 
+        b.setTrainNo(req.trainNo);
+        b.setTrainName(req.trainName);
+        b.setTrainDepartureTime(req.trainDepartureTime);
+        b.setEmail(req.email);
+
         // simple fee calc (same as frontend mock)
         double base = 50;
         double weightFactor = (req.weightKg != null ? req.weightKg * 10 : 0);

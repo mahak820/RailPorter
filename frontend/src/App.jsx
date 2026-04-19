@@ -10,6 +10,7 @@ import { getCurrentUser } from "./services/auth";
 import BookingForm from "./components/book/BookingForm";
 import BookingDetails from "./components/book/BookingDetails"; //  correct path
 import TrackBooking from "./components/track/TracKBooking";
+import TrainSearch from "./components/trains/TrainSearch";
 import FullPageLoader from "./components/pageloaders/FullPageLoader";
 import GridLoader from "./components/pageloaders/GridLoader";
 import Loader from "./components/Loader";
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/book" element={<BookingForm />} />
         <Route path="/booking/:id" element={<BookingDetails />} /> {/* ✅ new */}
         <Route path="/track" element={<TrackBooking />} />
+        <Route path="/trains" element={<TrainSearch />} />
 
         {/* Example protected route */}
         <Route

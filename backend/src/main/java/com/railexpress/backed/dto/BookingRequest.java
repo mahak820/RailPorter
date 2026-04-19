@@ -17,5 +17,10 @@ public class BookingRequest {
     public String description;
     public String email;
 
+    // Train selection (optional)
+    public String trainNo;
+    public String trainName;
+    public String trainDepartureTime;
+
     // optionally add getters/setters or use public fields for simplicity
 }

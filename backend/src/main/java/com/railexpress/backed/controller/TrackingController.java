@@ -4,6 +4,7 @@ import com.railexpress.backed.model.Booking;
 import com.railexpress.backed.model.StatusUpdate;
 import com.railexpress.backed.repository.BookingRepository;
 import com.railexpress.backed.repository.StatusUpdateRepository;
+import com.railexpress.backed.service.EmailService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,10 +18,14 @@ public class TrackingController {
 
     private final StatusUpdateRepository statusRepo;
     private final BookingRepository bookingRepo;
+    private final EmailService emailService;
 
-    public TrackingController(StatusUpdateRepository statusRepo, BookingRepository bookingRepo) {
+    public TrackingController(StatusUpdateRepository statusRepo,
+                              BookingRepository bookingRepo,
+                              EmailService emailService) {
         this.statusRepo = statusRepo;
         this.bookingRepo = bookingRepo;
+        this.emailService = emailService;
     }
 
     /**
@@ -77,6 +82,17 @@ public class TrackingController {
         if (booking != null) {
             booking.setStatus(status);
             bookingRepo.save(booking);
+
+            // Send email notification if the booking has an email on file.
+            // Mail failures should NOT break the status-update API.
+            if (booking.getEmail() != null && !booking.getEmail().isBlank()) {
+                try {
+                    emailService.sendStatusUpdate(booking.getEmail(), booking, status, location, notes);
+                } catch (Exception mailEx) {
+                    System.out.println("Warning: status-update email failed for " + booking.getBookingRef());
+                    mailEx.printStackTrace();
+                }
+            }
         }
 
         return ResponseEntity.ok(saved);

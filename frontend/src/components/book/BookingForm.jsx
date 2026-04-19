@@ -1,9 +1,11 @@
 // frontend/src/components/book/BookingForm.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import "./BookingForm.css";
 import { useNavigate } from "react-router-dom";
+import StationAutocomplete from "../common/StationAutocomplete";
+import { searchTrains } from "../../services/trains";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "";
 
@@ -38,6 +40,47 @@ export default function BookingForm() {
   const [estimating, setEstimating] = useState(false);
   const navigate = useNavigate?.() || (() => {});
 
+  // Train selection state
+  const [depCode, setDepCode] = useState("");
+  const [arrCode, setArrCode] = useState("");
+  const [trains, setTrains] = useState([]);
+  const [trainsLoading, setTrainsLoading] = useState(false);
+  const [trainsError, setTrainsError] = useState(null);
+  const [selectedTrain, setSelectedTrain] = useState(null);
+  const [currentDate, setCurrentDate] = useState(todayIso);
+
+  // Auto-fetch trains when both station codes + date are set
+  useEffect(() => {
+    if (!depCode || !arrCode) {
+      setTrains([]);
+      setSelectedTrain(null);
+      return;
+    }
+    if (depCode === arrCode) {
+      setTrains([]);
+      setSelectedTrain(null);
+      setTrainsError("From and To stations must be different");
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      setTrainsLoading(true);
+      setTrainsError(null);
+      try {
+        const data = await searchTrains({ from: depCode, to: arrCode, date: currentDate });
+        if (!cancelled) {
+          setTrains(data.trains || []);
+          setSelectedTrain(null);
+        }
+      } catch (err) {
+        if (!cancelled) setTrainsError(err.message || "Failed to fetch trains");
+      } finally {
+        if (!cancelled) setTrainsLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [depCode, arrCode, currentDate]);
+
   async function submitBooking(values) {
     setServerError(null);
     setLoading(true);
@@ -59,7 +102,10 @@ export default function BookingForm() {
       containsLiquids: !!values.containsLiquids,
       containsRestrictedItems: !!values.containsRestrictedItems,
       declaration: values.declaration,
-      email: values.email
+      email: values.email,
+      trainNo: selectedTrain?.trainNo || null,
+      trainName: selectedTrain?.trainName || null,
+      trainDepartureTime: selectedTrain?.departure || null,
     };
 
     try {
@@ -170,13 +216,25 @@ export default function BookingForm() {
                 <div className="form-grid">
                   <div>
                     <label>Departure Station</label>
-                    <Field name="departureStation" placeholder="e.g., Pune" />
+                    <StationAutocomplete
+                      name="departureStation"
+                      value={values.departureStation}
+                      onChange={(v) => { setFieldValue("departureStation", v); setDepCode(""); }}
+                      onSelect={(s) => { setFieldValue("departureStation", s.name); setDepCode(s.code); }}
+                      placeholder="Type city or code, e.g., Bhopal or BPL"
+                    />
                     <div className="field-error"><ErrorMessage name="departureStation" /></div>
                   </div>
 
                   <div>
                     <label>Arrival Station</label>
-                    <Field name="arrivalStation" placeholder="e.g., Mumbai" />
+                    <StationAutocomplete
+                      name="arrivalStation"
+                      value={values.arrivalStation}
+                      onChange={(v) => { setFieldValue("arrivalStation", v); setArrCode(""); }}
+                      onSelect={(s) => { setFieldValue("arrivalStation", s.name); setArrCode(s.code); }}
+                      placeholder="Type city or code, e.g., Mumbai or BCT"
+                    />
                     <div className="field-error"><ErrorMessage name="arrivalStation" /></div>
                   </div>
 
@@ -186,7 +244,7 @@ export default function BookingForm() {
                       name="dateOfTransport"
                       type="date"
                       value={values.dateOfTransport}
-                      onChange={(e) => setFieldValue("dateOfTransport", e.target.value)}
+                      onChange={(e) => { setFieldValue("dateOfTransport", e.target.value); setCurrentDate(e.target.value); }}
                     />
                     <small style={{ color: "#475569" }}>Selected: <b>{toDDMMYYYY(values.dateOfTransport)}</b></small>
                     <div className="field-error"><ErrorMessage name="dateOfTransport" /></div>
@@ -200,6 +258,92 @@ export default function BookingForm() {
                       <option value="bike">Two-wheeler</option>
                     </Field>
                     <div className="field-error"><ErrorMessage name="luggageTypeId" /></div>
+                  </div>
+
+                  {/* -------- Train selection -------- */}
+                  <div className="form-row full" style={{ marginTop: 6 }}>
+                    <label>Select your Train</label>
+                    <div
+                      style={{
+                        background: "rgba(15,23,42,0.35)",
+                        border: "1px solid #253745",
+                        borderRadius: 10,
+                        padding: 12,
+                        minHeight: 64,
+                      }}
+                    >
+                      {(!depCode || !arrCode) && (
+                        <div style={{ color: "#94a3b8", fontSize: 13 }}>
+                          Pick both stations from the dropdown to see available trains.
+                        </div>
+                      )}
+
+                      {depCode && arrCode && trainsLoading && (
+                        <div style={{ color: "#94a3b8", fontSize: 13 }}>Searching trains…</div>
+                      )}
+
+                      {trainsError && (
+                        <div style={{ color: "#f87171", fontSize: 13 }}>{trainsError}</div>
+                      )}
+
+                      {depCode && arrCode && !trainsLoading && !trainsError && trains.length === 0 && (
+                        <div style={{ color: "#fbbf24", fontSize: 13 }}>
+                          No direct trains in our database for this pair. You can still book without selecting a train.
+                        </div>
+                      )}
+
+                      {trains.length > 0 && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                          {trains.map((t) => {
+                            const isSel = selectedTrain?.trainNo === t.trainNo;
+                            return (
+                              <label
+                                key={t.trainNo}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 12,
+                                  padding: 10,
+                                  border: `1px solid ${isSel ? "#10b981" : "#253745"}`,
+                                  borderRadius: 8,
+                                  background: isSel ? "rgba(16,185,129,0.08)" : "transparent",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <input
+                                  type="radio"
+                                  name="trainPick"
+                                  checked={isSel}
+                                  onChange={() => setSelectedTrain(t)}
+                                />
+                                <div style={{ flex: 1 }}>
+                                  <div style={{ fontSize: 14, fontWeight: 700, color: "#e2e8f0" }}>
+                                    {t.trainName}{" "}
+                                    <span style={{ color: "#94a3b8", fontWeight: 500 }}>
+                                      ({t.trainNo})
+                                    </span>
+                                  </div>
+                                  <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 2 }}>
+                                    {t.fromName} ({t.fromCode}) → {t.toName} ({t.toCode})
+                                  </div>
+                                </div>
+                                <div style={{ textAlign: "right" }}>
+                                  <div style={{ fontSize: 15, fontWeight: 700, color: "#10b981" }}>
+                                    {t.departure}
+                                  </div>
+                                  <div style={{ fontSize: 11, color: "#94a3b8" }}>Departure</div>
+                                </div>
+                              </label>
+                            );
+                          })}
+                          {selectedTrain && (
+                            <div style={{ fontSize: 12, color: "#10b981", marginTop: 4 }}>
+                              ✓ Drop your luggage at <b>{selectedTrain.fromName}</b> at least <b>60 min</b> before <b>{selectedTrain.departure}</b>.
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div>
@@ -355,6 +499,29 @@ export default function BookingForm() {
                       <span style={{ color: "#94a3b8" }}>Date</span>
                       <span style={{ fontWeight: 600 }}>{b.dateOfTransport}</span>
                     </div>
+                    {b.trainNo && (
+                      <>
+                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                          <span style={{ color: "#94a3b8" }}>Train</span>
+                          <span style={{ fontWeight: 600 }}>{b.trainName} ({b.trainNo})</span>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                          <span style={{ color: "#94a3b8" }}>Departs</span>
+                          <span style={{ fontWeight: 700, color: "#10b981" }}>{b.trainDepartureTime}</span>
+                        </div>
+                        <div style={{
+                          background: "rgba(16,185,129,0.12)",
+                          border: "1px solid rgba(16,185,129,0.35)",
+                          padding: "8px 10px",
+                          borderRadius: 8,
+                          fontSize: 12,
+                          color: "#10b981",
+                          lineHeight: 1.4,
+                        }}>
+                          ⏰ Reach <b>{b.departureStation}</b> by <b>{b.trainDepartureTime}</b> — ideally <b>60 min earlier</b> for luggage pickup.
+                        </div>
+                      </>
+                    )}
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
                       <span style={{ color: "#94a3b8" }}>Weight</span>
                       <span style={{ fontWeight: 600 }}>{b.weightKg} kg</span>
